@@ -22,7 +22,7 @@ import com.zcunsoft.image.process.constants.TestCaseConstants;
 public class ImageMatTest {
 
 	@Test
-	public void testImageMatTest() {
+	public void testImageMat() {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		// 第一种创建方法 create
 		/*

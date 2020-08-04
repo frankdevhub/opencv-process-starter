@@ -20,6 +20,6 @@ public class ImageGrabCutTest {
 	
 	@Test
 	public void testImageGrabCut() {
-
+         
 	}
 }

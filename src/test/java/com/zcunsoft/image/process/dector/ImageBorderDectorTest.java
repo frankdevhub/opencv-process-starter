@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import com.zcunsoft.image.process.constants.TestCaseConstants;
 
 /**
- *
  * @Author:frankdevhub@gmail.com</br>
  * 
  * @CreateDate:2020年8月3日 下午9:24:39</br>
@@ -57,8 +56,8 @@ public class ImageBorderDectorTest {
 		 * IMREAD_ANYCOLOR=4图像以任何可能的颜色格式读取 IMREAD_LOAD_GDAL=8使用GDAL驱动读取文件
 		 *
 		 */
-
-		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "cute_puppy.png");
+        
+		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "cute_puppy_gray01.png");
 		Imgproc.resize(src, src, new Size(src.cols() / 2, src.rows() / 2));
 
 		LOGGER.debug("display source image sample");
