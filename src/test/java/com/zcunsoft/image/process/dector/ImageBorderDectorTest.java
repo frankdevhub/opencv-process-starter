@@ -15,6 +15,8 @@ import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zcunsoft.image.process.constants.TestCaseConstants;
+
 /**
  *
  * @Author:frankdevhub@gmail.com</br>
@@ -32,8 +34,10 @@ public class ImageBorderDectorTest {
 	}
 
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-	private final String SAMPLE_PATH_PREFIX = "D:/frankdevhub-workspace/samples/";
-	private final String SAMPLE_URL = "https://art-photo-oss.zcunsoft.com/data/itemZip/20200730/d7ab0ff27dab4262bab0c7f7890536ae.jpg";
+	// private final String SAMPLE_PATH_PREFIX =
+	// "D:/frankdevhub-workspace/samples/";
+	// private final String SAMPLE_URL =
+	// "https://art-photo-oss.zcunsoft.com/data/itemZip/20200730/d7ab0ff27dab4262bab0c7f7890536ae.jpg";
 
 	@Test
 	public void imageBorderDector() {
@@ -54,7 +58,7 @@ public class ImageBorderDectorTest {
 		 *
 		 */
 
-		Mat src = Imgcodecs.imread(SAMPLE_PATH_PREFIX + "camera_env03.jpg");
+		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "cute_puppy.png");
 		Imgproc.resize(src, src, new Size(src.cols() / 2, src.rows() / 2));
 
 		LOGGER.debug("display source image sample");
@@ -79,20 +83,20 @@ public class ImageBorderDectorTest {
 		// 查找图片对象中的轮廓
 		/**
 		 *
-		 * RETR_EXTERNAL = 0, 只检测最外围轮廓，包含在外围轮廓内的内围轮廓被忽略；
-		 * RETR_LIST = 1,检测所有的轮廓，包括内围、外围轮廓，但是检测到的轮廓不建立等级关系，彼此之间独立，没有等级关系，这就意味着这个检索模式下不存在父轮廓或内嵌轮廓
-		 * RETR_CCOMP = 2,检测所有的轮廓，但所有轮廓只建立两个等级关系，外围为顶层，若外围内的内围轮廓还包含了其他的轮廓信息，则内围内的所有轮廓均归属于顶层；
+		 * RETR_EXTERNAL = 0, 只检测最外围轮廓，包含在外围轮廓内的内围轮廓被忽略； RETR_LIST =
+		 * 1,检测所有的轮廓，包括内围、外围轮廓，但是检测到的轮廓不建立等级关系，彼此之间独立，没有等级关系，这就意味着这个检索模式下不存在父轮廓或内嵌轮廓
+		 * RETR_CCOMP =
+		 * 2,检测所有的轮廓，但所有轮廓只建立两个等级关系，外围为顶层，若外围内的内围轮廓还包含了其他的轮廓信息，则内围内的所有轮廓均归属于顶层；
 		 * RETR_TREE = 3,检测所有轮廓，所有轮廓建立一个等级树结构。外层轮廓包含内层轮廓，内层轮廓还可以继续包含内嵌轮廓
-		 * RETR_FLOODFILL = 4; 官方没定义 使用此参数需要把输入源转为CV_32SC1
-		 * Mat dst = new Mat();
-		 * edges.convertTo(dst,CvType.CV_32SC1);
-		 * CHAIN_APPROX_NONE = 1,保存物体边界上所有连续的轮廓点到contours向量内；
-		 * CHAIN_APPROX_SIMPLE = 2,仅保存轮廓的拐点信息，把所有轮廓拐点处的点保存入contours向量内，拐点与拐点之间直线段上的信息点不予保留；
+		 * RETR_FLOODFILL = 4; 官方没定义 使用此参数需要把输入源转为CV_32SC1 Mat dst = new Mat();
+		 * edges.convertTo(dst,CvType.CV_32SC1); CHAIN_APPROX_NONE =
+		 * 1,保存物体边界上所有连续的轮廓点到contours向量内； CHAIN_APPROX_SIMPLE =
+		 * 2,仅保存轮廓的拐点信息，把所有轮廓拐点处的点保存入contours向量内，拐点与拐点之间直线段上的信息点不予保留；
 		 * CHAIN_APPROX_TC89_L1 = 3,使用teh-Chinl chain 近似算法;
 		 * CHAIN_APPROX_TC89_KCOS = 4; 使用teh-Chinl chain 近似算法。
 		 *
 		 **/
-		
+
 		LOGGER.debug("invoke findContours{...}");
 		Imgproc.findContours(edges, list, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
