@@ -56,7 +56,7 @@ public class ImageBorderDectorTest {
 		 * IMREAD_ANYCOLOR=4图像以任何可能的颜色格式读取 IMREAD_LOAD_GDAL=8使用GDAL驱动读取文件
 		 *
 		 */
-        
+
 		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "cute_puppy_gray01.png");
 		Imgproc.resize(src, src, new Size(src.cols() / 2, src.rows() / 2));
 
