@@ -34,10 +34,10 @@ public class ImageGrayConverterTest {
 	@Test
 	// 单通道,多通道图片转换为灰度图片
 	public void testImageBorderDector() {
-		LOGGER.info("srcGrayConverterstart");
+		LOGGER.debug("srcGrayConverter start");
 		LOGGER.debug("load testing src sample");
 
-		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "camera_env03.jpg");
+		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "mask_example.jpg");
 		Imgproc.resize(src, src, new Size(src.cols() / 2, src.rows() / 2));
 		Imgproc.cvtColor(src, src, Imgproc.COLOR_RGB2GRAY);
 		int channels = src.channels();// 获取图像通道数
@@ -52,7 +52,7 @@ public class ImageGrayConverterTest {
 				}
 			}
 		}
-		HighGui.imshow("src", src);
+		HighGui.imshow("src2dst", src);
 		HighGui.waitKey();
 	}
 }

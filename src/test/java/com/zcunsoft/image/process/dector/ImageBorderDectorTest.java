@@ -40,7 +40,7 @@ public class ImageBorderDectorTest {
 
 	@Test
 	public void imageBorderDector() {
-		LOGGER.info("imageBorderDector start");
+		LOGGER.debug("imageBorderDector start");
 		LOGGER.debug("load testing image sample");
 		// Mat src =
 		// Imgcodecs.imread("src/main/resources/samples/border_test01.jpg");
@@ -61,7 +61,7 @@ public class ImageBorderDectorTest {
 		Imgproc.resize(src, src, new Size(src.cols() / 2, src.rows() / 2));
 
 		LOGGER.debug("display source image sample");
-		HighGui.imshow("source image display", src);
+		HighGui.imshow("source", src);
 		HighGui.waitKey();
 
 		// 图片灰度化
@@ -102,7 +102,7 @@ public class ImageBorderDectorTest {
 		// 绘制轮廓轮廓或填充轮廓
 		LOGGER.debug("invoke drawContours{...}");
 		Imgproc.drawContours(src, list, -1, new Scalar(0, 255, 0), Imgproc.LINE_4, Imgproc.LINE_AA);
-		HighGui.imshow("marked image display", src);
+		HighGui.imshow("dst", src);
 		HighGui.waitKey(0);
 	}
 }

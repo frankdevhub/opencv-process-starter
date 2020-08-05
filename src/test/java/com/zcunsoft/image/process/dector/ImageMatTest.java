@@ -38,7 +38,8 @@ public class ImageMatTest {
 		 */
 
 		// 类型与大小读取
-		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "cute_puppy.png", Imgcodecs.IMREAD_GRAYSCALE);
+		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "border_test01.jpg",
+				Imgcodecs.IMREAD_GRAYSCALE);
 		int type = src.type();
 		int width = src.cols();
 		int heigth = src.rows();
@@ -85,11 +86,9 @@ public class ImageMatTest {
 					b = data[row * channels * width + col * channels] & 0xff;
 					g = data[row * channels * width + col * channels + 1] & 0xff;
 					r = data[row * channels * width + col * channels + 2] & 0xff;
-
 					b = 255 - b;
 					g = 255 - g;
 					r = 255 - r;
-
 					data[row * channels * width + col * channels] = (byte) b;
 					data[row * channels * width + col * channels + 1] = (byte) g;
 					data[row * channels * width + col * channels + 2] = (byte) r;
@@ -102,7 +101,7 @@ public class ImageMatTest {
 
 		}
 		src.put(0, 0, data);
-		Imgcodecs.imwrite(TestCaseConstants.SAMPLE_PATH_PREFIX + "cute_puppy.png", src);
+		Imgcodecs.imwrite(TestCaseConstants.SAMPLE_PATH_PREFIX + "border_test01.jpg", src);
 		src.release();
 		dst.release();
 	}
