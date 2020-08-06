@@ -17,9 +17,8 @@ import org.junit.Test;
 // 利用色调反差的分割算法，把图像分为目标区域和其他部分
 public class ImageGrabCutTest {
 
-	
 	@Test
 	public void testImageGrabCut() {
-         
+
 	}
 }

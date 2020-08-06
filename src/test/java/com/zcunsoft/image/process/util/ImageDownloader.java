@@ -54,7 +54,7 @@ public class ImageDownloader {
 			return false;
 		}
 	}
-
+ 
 	@Test
 	public void testDownloadImageResource() {
 		String fileUrl = "https://art-photo-oss.zcunsoft.com/data/itemZip/20200730/d7ab0ff27dab4262bab0c7f7890536ae.jpg";

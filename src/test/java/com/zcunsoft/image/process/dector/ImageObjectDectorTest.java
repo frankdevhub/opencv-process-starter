@@ -3,6 +3,7 @@ package com.zcunsoft.image.process.dector;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -53,7 +54,6 @@ public class ImageObjectDectorTest {
 	private MatOfPoint2f approx = new MatOfPoint2f();
 	private List<MatOfPoint> hulls = new ArrayList<MatOfPoint>();
 	private Integer rectAreaIndex = -1;
-	private List<double[]> lines = new ArrayList<double[]>(); // 离散点组成的线条对象的集合
 	private List<Point> corners = new ArrayList<Point>(); // 多条线条对象相交的定点的集合
 	private List<Point> newPointList = new ArrayList<Point>();
 	private MatOfPoint result = null; // 目标图像内面积最大的矩形坐标属性
@@ -93,10 +93,9 @@ public class ImageObjectDectorTest {
 	// 1.Canny边缘检测
 	// 2.膨胀，连接边缘
 	private Mat imageBorderDector(Mat src) {
-		LOGGER.info("testDigitalFilter start");
 		Assert.assertNotNull("cannot find src", src);
 		// 构造返回结果矩阵
-		Imgproc.Canny(src, src, 20, 60, 3, false);// Canny边缘检测
+		Imgproc.Canny(src, src, 40, 120, 3, false);// Canny边缘检测
 		Imgproc.dilate(src, src, new Mat(), new Point(-1, -1), 3, 1, new Scalar(1)); // 膨胀，连接边缘
 		HighGui.imshow("bordered", src);
 		return src;
@@ -113,7 +112,6 @@ public class ImageObjectDectorTest {
 
 	// 轮廓检测
 	private List<MatOfPoint> imageCounterDector(Mat src) {
-		LOGGER.info("testCounterDector start");
 		Assert.assertNotNull("cannot find src", src);
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		Mat hierarchy = new Mat();
@@ -125,26 +123,19 @@ public class ImageObjectDectorTest {
 	}
 
 	// 寻找凸包拟合多边形
-	@SuppressWarnings("unused")
 	private List<MatOfPoint> approxPolygon(List<MatOfPoint> contours) throws Exception {
-		LOGGER.info("approxPolygon start");
 		Assert.assertNotNull("cannot find contours", contours);
 		// 找出轮廓对应凸包的四边形拟合
 		List<MatOfPoint> squares = new ArrayList<MatOfPoint>();
 		List<MatOfPoint> hulls = new ArrayList<MatOfPoint>();
 		MatOfInt hull = new MatOfInt();
 		MatOfPoint2f approx = new MatOfPoint2f();
-
 		approx.convertTo(approx, CvType.CV_32F);
-		if (null == approx)
-			throw new Exception("cannot find approx");
 		this.approx = approx;
 
 		for (MatOfPoint contour : contours) {
-			// 边框的凸包
-			Imgproc.convexHull(contour, hull);
-			// 用凸包计算出新的轮廓点
-			Point[] contourPoints = contour.toArray();
+			Imgproc.convexHull(contour, hull);// 获取多边形的凸包结构对象
+			Point[] contourPoints = contour.toArray();// 凸包结构对象获取新的轮廓点
 			int[] indices = hull.toArray();
 			List<Point> newPoints = new ArrayList<Point>();
 			for (int index : indices) {
@@ -152,13 +143,13 @@ public class ImageObjectDectorTest {
 			}
 			MatOfPoint2f contourHull = new MatOfPoint2f();
 			contourHull.fromList(newPoints);
-			// 多边形拟合凸包边框(此时的拟合的精度较低)
-			Imgproc.approxPolyDP(contourHull, approx, Imgproc.arcLength(contourHull, true) * 0.05, true);
+			// 多边形拟合凸包边框
+			Imgproc.approxPolyDP(contourHull, approx, Imgproc.arcLength(contourHull, true) * 0.02, true);
 			// 筛选出面积大于某一阈值的，且四边形的各个角度都接近直角的凸四边形
 			MatOfPoint approxf1 = new MatOfPoint();
 			approx.convertTo(approxf1, CvType.CV_32S);
 			// TODO
-			System.out.println("approx rows = " + approx.rows() + "\tapprox cols = " + approx.cols() + ",contourArea = "
+			LOGGER.info("approx rows = " + approx.rows() + "\tapprox cols = " + approx.cols() + ",contourArea = "
 					+ Math.abs(Imgproc.contourArea(approx)) + ", convex = " + Imgproc.isContourConvex(approxf1));
 			if (approx.rows() == 4 && Math.abs(Imgproc.contourArea(approx)) > 40000
 					&& Imgproc.isContourConvex(approxf1)) {
@@ -168,8 +159,7 @@ public class ImageObjectDectorTest {
 							getAngle(approxf1.toArray()[j % 4], approxf1.toArray()[j - 2], approxf1.toArray()[j - 1]));
 					maxCosine = Math.max(maxCosine, cosine);
 				}
-				// 角度大概72度
-				System.out.println("transform angle");
+				LOGGER.info("transform angle");
 				if (maxCosine < 0.3) {
 					MatOfPoint tmp = new MatOfPoint();
 					contourHull.convertTo(tmp, CvType.CV_32S);
@@ -179,7 +169,7 @@ public class ImageObjectDectorTest {
 			}
 		}
 		this.hulls = hulls;
-		System.out.println("hulls size = " + this.hulls.size());
+		LOGGER.info("hulls size = " + this.hulls.size());
 		return hulls;
 	}
 
@@ -192,12 +182,10 @@ public class ImageObjectDectorTest {
 		int currentIndex = 0;
 		if (squares.size() == 0) {
 			throw new Exception("squares size cannot be zero");
-			/*
-			 * max_square_idx = -1; return null;
-			 */
 		} else {
 			for (MatOfPoint square : squares) {
 				Rect rectangle = Imgproc.boundingRect(square);
+				// 遍历获取最大的矩形特征对象
 				if (rectangle.width >= max_width && rectangle.height >= max_height) {
 					max_width = rectangle.width;
 					max_height = rectangle.height;
@@ -206,17 +194,17 @@ public class ImageObjectDectorTest {
 				currentIndex++;
 			}
 			MatOfPoint result = squares.get(max_square_idx);
+			Assert.assertNotNull("cannot find result", result);
 			LOGGER.info("result is null = " + Boolean.valueOf(null == result));
 			LOGGER.info("result rows  =" + result.rows());
 			LOGGER.info("result cols = " + result.cols());
-
 			if (result.rows() != 0 || result.cols() != 0) {
 				this.result = result;
 				this.rectAreaIndex = max_square_idx;
 				return result;
 			}
+			return result;
 		}
-		return null;
 	}
 
 	// 寻找矩形的四条边,直线轮廓检测
@@ -242,16 +230,14 @@ public class ImageObjectDectorTest {
 			return new Point(-1, -1);
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// newPointList size = 0
 	// corners size = 0
 	private void getAreaLineCorners() {
 		// 找到高精度拟合时得到的顶点中 距离小于低精度拟合得到的四个顶点maxL的顶点，排除部分顶点的干扰
 		Assert.assertNotNull("cannot find result", this.result);
-		System.out.println("result size = " + result.size());
-		System.out.println("approx array = " + approx.toArray().length);
-		System.out.println("newPointList size = " + newPointList.size());
-
+		LOGGER.info("result size = " + result.size());
+		LOGGER.info("approx array = " + approx.toArray().length);
+		LOGGER.info("newPointList size = " + newPointList.size());
 		for (Point p : approx.toArray()) {
 			if (!(getSpacePointToPoint(p, this.result.toList().get(0)) > maxL
 					&& getSpacePointToPoint(p, this.result.toList().get(1)) > maxL
@@ -269,21 +255,22 @@ public class ImageObjectDectorTest {
 				lines.add(new double[] { p1.x, p1.y, p2.x, p2.y });
 			}
 		}
+		LOGGER.info("lines size = " + lines.size());
 		// 计算出这四条边中 相邻两条边的交点，即物体的四个顶点
 		List<Point> corners = new ArrayList<Point>();
 		for (int i = 0; i < lines.size(); i++) {
 			Point corner = computeIntersect(lines.get(i), lines.get((i + 1) % lines.size()));
 			corners.add(corner);
 		}
-		System.out.println("corners size = " + corners.size());
+		LOGGER.info("corners size = " + corners.size());
 		this.corners = corners;
+
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 对多个点按顺时针排序
 	private void sortCorners(List<Point> corners) throws Exception {
 		if (corners.size() == 0)
-			throw new Exception("corners size cannot be zero");
+			return;
 		Point p1 = corners.get(0);
 		int index = 0;
 		for (int i = 1; i < corners.size(); i++) {
@@ -310,10 +297,14 @@ public class ImageObjectDectorTest {
 		this.corners = corners;
 	}
 
-	public Mat transFormROIImageArea() throws Exception {
+	// 在假设已经知道需要瞬时针方向旋转的情况下进行角度矫正
+	private Mat transFormROIImageArea() throws Exception {
+		// 校验是否含有定点的数据
+		if (this.corners.size() <= 0)
+			throw new Exception("corners size cannot be zero");
 		// 对顶点顺时针排序
 		sortCorners(corners);
-		// 计算目标图像的尺寸
+		// 获取目标图像的尺寸大小
 		Point p0 = corners.get(0);
 		Point p1 = corners.get(1);
 		Point p2 = corners.get(2);
@@ -352,10 +343,8 @@ public class ImageObjectDectorTest {
 	// junit.framework.AssertionFailedError: cannot find rectArea
 	// 简单规则物体的检测流程测试
 	public void testDectorFlow() throws Exception {
-		LOGGER.info("testDectorFlow start");
-		// 加载测试用例图片
-		// mask_example.jpg
-		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "bank_card.jpg");
+		// mask_example.jpg//camera_env03.jpg//bank_card.jpg
+		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "ticket.jpg");
 		Assert.assertNotNull("cannot find src image", src);
 
 		// 降噪处理,二次膨胀色差增强突出边界线条
@@ -363,28 +352,28 @@ public class ImageObjectDectorTest {
 		Mat bordered = imageBorderDector(filtered);
 		// 物体边缘检测
 		List<MatOfPoint> contours = imageCounterDector(bordered);
-		System.out.println("contours size = " + contours.size());
+		LOGGER.info("contours size = " + contours.size());
 		Assert.assertNotNull("cannot find contours", contours);
-
+		HighGui.imshow("border dector", bordered);
+		HighGui.waitKey();
 		// TODO: approxPolygon 检测矩形边界???cores = []
-		System.out.println("approxPolygon start");
 		List<MatOfPoint> squares = approxPolygon(contours);
-		System.out.println("squares size = " + squares.size());
+		LOGGER.info("squares size = " + squares.size());
 		Assert.assertNotNull("cannot find squares", squares);
 		// 锁定离散的像素点中最大的矩阵区域面积
 		// TODO: rectArea?
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		MatOfPoint rectArea = findLargestSquare(squares);
 		Assert.assertNotNull("cannot find rectArea", rectArea);
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// 找到这个最大的四边形对应的凸边框，再次进行多边形拟合，此次精度较高，拟合的结果可能是大于4条边的多边形
-		System.out.println("rectAreaIndex = " + this.rectAreaIndex);
-		/*
-		 * MatOfPoint contourHull = this.hulls.get(this.rectAreaIndex);
-		 * MatOfPoint2f tmp = new MatOfPoint2f(); contourHull.convertTo(tmp,
-		 * CvType.CV_32F); Imgproc.approxPolyDP(tmp, approx, 3, true);
-		 */
+		LOGGER.info("rectAreaIndex = " + this.rectAreaIndex);
+
+		MatOfPoint contourHull = this.hulls.get(this.rectAreaIndex);
+		MatOfPoint2f tmp = new MatOfPoint2f();
+		contourHull.convertTo(tmp, CvType.CV_32F);
+		Imgproc.approxPolyDP(tmp, approx, 3, true);
+		HighGui.imshow("border approxPolyDP", bordered);
+		HighGui.waitKey();
+
 		// TODO: corner?
 		getAreaLineCorners();
 		double maxL = Imgproc.arcLength(approx, true) * 0.02;
@@ -393,12 +382,13 @@ public class ImageObjectDectorTest {
 		// 获取提取后的矩阵
 		// TODO:ERROR: corners = [] ?????
 		Mat handled = transFormROIImageArea();
-		LOGGER.debug("display handled image sample");
+		LOGGER.info("display handled image sample");
 		HighGui.imshow("handled", handled);
 		HighGui.waitKey();
 	}
 
-	public static void main(String[] args) throws Exception {
+	@Test
+	public void testObjectDectorExample() throws Exception {
 		new ImageObjectDectorTest().testDectorFlow();
 	}
 

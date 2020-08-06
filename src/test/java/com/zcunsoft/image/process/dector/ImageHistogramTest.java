@@ -21,6 +21,7 @@ import com.zcunsoft.image.process.util.HistogramUtil;
  * @blog:www.frankdevhub.site</br>
  *
  */
+
 public class ImageHistogramTest {
 	static {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);

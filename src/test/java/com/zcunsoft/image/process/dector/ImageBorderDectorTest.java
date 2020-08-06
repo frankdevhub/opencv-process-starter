@@ -65,12 +65,10 @@ public class ImageBorderDectorTest {
 		HighGui.waitKey();
 
 		// 图片灰度化
-		LOGGER.debug("invoke cvtColor{...}");
 		Mat gary = new Mat();
 		Imgproc.cvtColor(src, gary, Imgproc.COLOR_BGR2GRAY);
 
 		// 图像边缘处理
-		LOGGER.debug("invoke Canny{...}");
 		Mat edges = new Mat();
 		Imgproc.Canny(gary, edges, 200, 500, 3, false);
 
@@ -96,13 +94,11 @@ public class ImageBorderDectorTest {
 		 *
 		 **/
 
-		LOGGER.debug("invoke findContours{...}");
 		Imgproc.findContours(edges, list, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
 		// 绘制轮廓轮廓或填充轮廓
-		LOGGER.debug("invoke drawContours{...}");
 		Imgproc.drawContours(src, list, -1, new Scalar(0, 255, 0), Imgproc.LINE_4, Imgproc.LINE_AA);
 		HighGui.imshow("dst", src);
-		HighGui.waitKey(0);
+		HighGui.waitKey();
 	}
 }

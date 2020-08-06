@@ -23,6 +23,7 @@ import com.zcunsoft.image.process.constants.TestCaseConstants;
  * @blog:www.frankdevhub.site</br>
  *
  */
+
 public class ImageGrayConverterTest {
 
 	static {
