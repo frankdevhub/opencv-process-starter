@@ -40,8 +40,8 @@ public class ImageBorderDectorTest {
 
 	@Test
 	public void imageBorderDector() {
-		LOGGER.debug("imageBorderDector start");
-		LOGGER.debug("load testing image sample");
+		LOGGER.info("imageBorderDector start");
+		LOGGER.info("load testing image sample");
 		// Mat src =
 		// Imgcodecs.imread("src/main/resources/samples/border_test01.jpg");
 
@@ -60,7 +60,7 @@ public class ImageBorderDectorTest {
 		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "nini.jpg");
 		Imgproc.resize(src, src, new Size(src.cols() / 2, src.rows() / 2));
 
-		LOGGER.debug("display source image sample");
+		LOGGER.info("display source image sample");
 		HighGui.imshow("source", src);
 		HighGui.waitKey();
 
@@ -73,7 +73,7 @@ public class ImageBorderDectorTest {
 		Imgproc.Canny(gary, edges, 200, 500, 3, false);
 
 		// 发现轮廓
-		LOGGER.debug("seach and mark image border entities");
+		LOGGER.info("seach and mark image border entities");
 		List<MatOfPoint> list = new ArrayList<MatOfPoint>();
 		Mat hierarchy = new Mat();
 

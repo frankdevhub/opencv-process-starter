@@ -9,10 +9,9 @@ import java.net.URL;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import com.zcunsoft.image.process.constants.TestCaseConstants;
-
-import junit.framework.Assert;
 
 /**
  *
@@ -28,12 +27,12 @@ import junit.framework.Assert;
 
 public class ImageDownloader {
 
-	private final Logger LOGGER = LoggerFactory.getLogger(ImageDownloader.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ImageDownloader.class);
 
 	public static boolean downloadImageResource(String fileUrl, String savePath) {
 		try {
-			Assert.assertNotNull(fileUrl, "cannot find fileUrl");
-			Assert.assertNotNull(savePath, "cannot find savePath");
+			Assert.notNull(fileUrl, "cannot find fileUrl");
+			Assert.notNull(savePath, "cannot find savePath");
 
 			URL url = new URL(fileUrl);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -50,16 +49,16 @@ public class ImageDownloader {
 			connection.disconnect();
 			return true;
 		} catch (Exception e) {
-			System.out.println(e + fileUrl + savePath);
+			LOGGER.error(e + fileUrl + savePath);
 			return false;
 		}
 	}
- 
+
 	@Test
 	public void testDownloadImageResource() {
 		String fileUrl = "https://art-photo-oss.zcunsoft.com/data/itemZip/20200730/d7ab0ff27dab4262bab0c7f7890536ae.jpg";
 		String savePath = TestCaseConstants.SAMPLE_PATH_PREFIX + "example.jpg";
 		boolean success = downloadImageResource(fileUrl, savePath);
-		LOGGER.debug(String.format("success = %s", success));
+		LOGGER.info(String.format("success = %s", success));
 	}
 }

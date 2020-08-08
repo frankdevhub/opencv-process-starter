@@ -19,10 +19,9 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import com.zcunsoft.image.process.constants.TestCaseConstants;
-
-import junit.framework.Assert;
 
 /**
  *
@@ -65,7 +64,7 @@ public class ImageObjectDectorTest {
 	// 2.彩色转灰度
 	// 3.高斯滤波，降噪
 	private Mat imageDigitalFilter(Mat src) {
-		Assert.assertNotNull("cannot find src", src);
+		Assert.notNull(src, "cannot find src");
 
 		LOGGER.info("testDigitalFilter start");
 		LOGGER.info("loading test sample source image");
@@ -82,7 +81,6 @@ public class ImageObjectDectorTest {
 		Imgproc.cvtColor(src, filtered, Imgproc.COLOR_BGR2GRAY);
 		// 彩色转换为灰度COLOR_BGR2GRAY
 		// /Imgproc.GaussianBlur(src, filter, new Size(3, 3), 2, 2);
-
 		LOGGER.info("display filtered image sample");
 		HighGui.imshow("filter", filtered);
 		HighGui.waitKey();
@@ -93,7 +91,7 @@ public class ImageObjectDectorTest {
 	// 1.Canny边缘检测
 	// 2.膨胀，连接边缘
 	private Mat imageBorderDector(Mat src) {
-		Assert.assertNotNull("cannot find src", src);
+		Assert.notNull(src, "cannot find src");
 		// 构造返回结果矩阵
 		Imgproc.Canny(src, src, 40, 120, 3, false);// Canny边缘检测
 		Imgproc.dilate(src, src, new Mat(), new Point(-1, -1), 3, 1, new Scalar(1)); // 膨胀，连接边缘
@@ -112,7 +110,7 @@ public class ImageObjectDectorTest {
 
 	// 轮廓检测
 	private List<MatOfPoint> imageCounterDector(Mat src) {
-		Assert.assertNotNull("cannot find src", src);
+		Assert.notNull(src, "cannot find src");
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		Mat hierarchy = new Mat();
 		Imgproc.findContours(src, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE); // RETR_EXTERNAL&CHAIN_APPROX_SIMPLE
@@ -124,7 +122,7 @@ public class ImageObjectDectorTest {
 
 	// 寻找凸包拟合多边形
 	private List<MatOfPoint> approxPolygon(List<MatOfPoint> contours) throws Exception {
-		Assert.assertNotNull("cannot find contours", contours);
+		Assert.notEmpty(contours, "contours cannot be empty");
 		// 找出轮廓对应凸包的四边形拟合
 		List<MatOfPoint> squares = new ArrayList<MatOfPoint>();
 		List<MatOfPoint> hulls = new ArrayList<MatOfPoint>();
@@ -175,7 +173,7 @@ public class ImageObjectDectorTest {
 
 	// 找到离散点的集合中的正方形区域
 	private MatOfPoint findLargestSquare(List<MatOfPoint> squares) throws Exception {
-		Assert.assertNotNull("cannot find squares", squares);
+		Assert.notEmpty(squares, "squares cannot be empty");
 		int max_width = 0;
 		int max_height = 0;
 		int max_square_idx = 0;
@@ -194,7 +192,7 @@ public class ImageObjectDectorTest {
 				currentIndex++;
 			}
 			MatOfPoint result = squares.get(max_square_idx);
-			Assert.assertNotNull("cannot find result", result);
+			Assert.notNull(result, "cannot find result");
 			LOGGER.info("result is null = " + Boolean.valueOf(null == result));
 			LOGGER.info("result rows  =" + result.rows());
 			LOGGER.info("result cols = " + result.cols());
@@ -234,7 +232,7 @@ public class ImageObjectDectorTest {
 	// corners size = 0
 	private void getAreaLineCorners() {
 		// 找到高精度拟合时得到的顶点中 距离小于低精度拟合得到的四个顶点maxL的顶点，排除部分顶点的干扰
-		Assert.assertNotNull("cannot find result", this.result);
+		Assert.notNull(this.result, "cannot find result");
 		LOGGER.info("result size = " + result.size());
 		LOGGER.info("approx array = " + approx.toArray().length);
 		LOGGER.info("newPointList size = " + newPointList.size());
@@ -345,7 +343,7 @@ public class ImageObjectDectorTest {
 	public void testDectorFlow() throws Exception {
 		// mask_example.jpg//camera_env03.jpg//bank_card.jpg
 		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "ticket.jpg");
-		Assert.assertNotNull("cannot find src image", src);
+		Assert.notNull(src, "cannot find src image");
 
 		// 降噪处理,二次膨胀色差增强突出边界线条
 		Mat filtered = imageDigitalFilter(src);
@@ -353,17 +351,17 @@ public class ImageObjectDectorTest {
 		// 物体边缘检测
 		List<MatOfPoint> contours = imageCounterDector(bordered);
 		LOGGER.info("contours size = " + contours.size());
-		Assert.assertNotNull("cannot find contours", contours);
+		Assert.notNull(contours, "cannot find contours");
 		HighGui.imshow("border dector", bordered);
 		HighGui.waitKey();
 		// TODO: approxPolygon 检测矩形边界???cores = []
 		List<MatOfPoint> squares = approxPolygon(contours);
 		LOGGER.info("squares size = " + squares.size());
-		Assert.assertNotNull("cannot find squares", squares);
+		Assert.notNull(squares, "cannot find squares");
 		// 锁定离散的像素点中最大的矩阵区域面积
 		// TODO: rectArea?
 		MatOfPoint rectArea = findLargestSquare(squares);
-		Assert.assertNotNull("cannot find rectArea", rectArea);
+		Assert.notNull(rectArea, "cannot find rectArea");
 		// 找到这个最大的四边形对应的凸边框，再次进行多边形拟合，此次精度较高，拟合的结果可能是大于4条边的多边形
 		LOGGER.info("rectAreaIndex = " + this.rectAreaIndex);
 
