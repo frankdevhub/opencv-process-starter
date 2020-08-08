@@ -57,7 +57,7 @@ public class ImageBorderDectorTest {
 		 *
 		 */
 
-		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "cute_puppy_gray01.png");
+		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "nini.jpg");
 		Imgproc.resize(src, src, new Size(src.cols() / 2, src.rows() / 2));
 
 		LOGGER.debug("display source image sample");

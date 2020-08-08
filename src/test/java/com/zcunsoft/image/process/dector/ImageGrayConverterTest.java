@@ -35,8 +35,8 @@ public class ImageGrayConverterTest {
 	@Test
 	// 单通道,多通道图片转换为灰度图片
 	public void testImageBorderDector() {
-		LOGGER.debug("srcGrayConverter start");
-		LOGGER.debug("load testing src sample");
+		LOGGER.info("srcGrayConverter start");
+		LOGGER.info("load testing src sample");
 
 		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "mask_example.jpg");
 		Imgproc.resize(src, src, new Size(src.cols() / 2, src.rows() / 2));

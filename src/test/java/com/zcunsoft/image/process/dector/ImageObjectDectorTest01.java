@@ -73,20 +73,20 @@ public class ImageObjectDectorTest01 {
 
 	@Test
 	public void testObjectDectorExample() {
-		LOGGER.debug("load image");
+		LOGGER.info("load image");
 		// ticket.jpg; bank_card.jpg
 		// book_02.jpg
 		// painting_example.jpg
 		// painting_example01.jpg
 		// painting_example02.jpg
 		// painting_example03.jpg
-		Mat img = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "painting_example01.jpg");
+		Mat img = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "4cbabb66985fb9664cb8aba2094bc3f.jpg");
 		double fscale = 0.8;
 		Size outSize = new Size();
 		outSize.width = img.cols() * fscale;
 		outSize.height = img.rows() * fscale;
 		// 按照比例裁剪
-		// Imgproc.resize(img, img, outSize, 0, 0, Imgproc.INTER_AREA);
+		Imgproc.resize(img, img, new Size(outSize.width, outSize.height), 0, 0, Imgproc.INTER_AREA);
 		HighGui.imshow("border dector source", img);
 		HighGui.waitKey();
 		Mat greyImg = img.clone();
@@ -101,18 +101,15 @@ public class ImageObjectDectorTest01 {
 		HighGui.imshow("gaussianBlurImg", gaussianBlurImg);
 		HighGui.waitKey();
 		Mat cannyImg = gaussianBlurImg.clone();
-
 		// Canny边缘检测
-		Imgproc.Canny(gaussianBlurImg, cannyImg, 90, 120, 3, false);
+		Imgproc.Canny(gaussianBlurImg, cannyImg, 30, 190, 3, false);
 		HighGui.imshow("cannyImg", cannyImg);
 		HighGui.waitKey();
-
 		// 膨胀，连接边缘
 		Mat dilateImg = cannyImg.clone();
 		Imgproc.dilate(cannyImg, dilateImg, new Mat(), new Point(-1, -1), 3, 1, new Scalar(1));
 		HighGui.imshow("dilateImg", dilateImg);
 		HighGui.waitKey();
-
 		// 对边缘检测的结果图再进行轮廓提取
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		List<MatOfPoint> drawContours = new ArrayList<MatOfPoint>();
@@ -121,7 +118,6 @@ public class ImageObjectDectorTest01 {
 		Mat linePic = Mat.zeros(dilateImg.rows(), dilateImg.cols(), CvType.CV_8UC3);
 		HighGui.imshow("linePic", linePic);
 		HighGui.waitKey();
-
 		// 找出轮廓对应凸包的四边形拟合
 		List<MatOfPoint> squares = new ArrayList<MatOfPoint>();
 		List<MatOfPoint> hulls = new ArrayList<MatOfPoint>();
@@ -152,7 +148,7 @@ public class ImageObjectDectorTest01 {
 			System.out.println("approx.rows() = " + approx.rows() + "\tMath.abs(Imgproc.contourArea(approx) = "
 					+ Math.abs(Imgproc.contourArea(approx)));
 			// 理想状态下是矩形,四边形;如果有干扰项则模糊估计为近似于矩形的多边形(4<rows<6)
-			if (approx.rows() == 4 && Math.abs(Imgproc.contourArea(approx)) > 20000 // case:20000
+			if (approx.rows() >= 4 && approx.rows() <= 5 && Math.abs(Imgproc.contourArea(approx)) > 107104 // case:20000
 					&& Imgproc.isContourConvex(approxf1)) {
 				double maxCosine = 0;
 				for (int j = 2; j < 5; j++) {
@@ -163,7 +159,7 @@ public class ImageObjectDectorTest01 {
 				System.out.println("maxCosine = " + maxCosine);
 				// 旋转角度的粗略估计
 				// 180-360*0.3 = 72
-				if (maxCosine < 0.03) {
+				if (maxCosine < 0.9494) {
 					MatOfPoint tmp = new MatOfPoint();
 					contourHull.convertTo(tmp, CvType.CV_32S);
 					squares.add(approxf1);
@@ -179,13 +175,11 @@ public class ImageObjectDectorTest01 {
 		}
 		HighGui.imshow("linePic mark lines", linePic);
 		HighGui.waitKey();
-
 		// 找出最大的矩形
 		int index = findLargestSquare(squares);
 		MatOfPoint largest_square = squares.get(index);
 		Mat polyPic = Mat.zeros(img.size(), CvType.CV_8UC3);
 		Imgproc.drawContours(polyPic, squares, index, new Scalar(0, 0, 255), 2);
-
 		// 存储矩形的四个凸点
 		hull = new MatOfInt();
 		Imgproc.convexHull(largest_square, hull, false);
@@ -198,7 +192,7 @@ public class ImageObjectDectorTest01 {
 			Imgproc.circle(polyPic, polyContoursList.get(hullList.get(i)), 10,
 					new Scalar(r.nextInt(255), r.nextInt(255), r.nextInt(255), 3));
 			hullPointList.add(polyContoursList.get(hullList.get(i)));
-			LOGGER.debug(hullList.get(i).toString());
+			LOGGER.info(hullList.get(i).toString());
 		}
 		Core.addWeighted(polyPic, 0.5, img, 0.5, 0, img);
 		for (int i = 0; i < hullPointList.size(); i++) {

@@ -31,7 +31,7 @@ public class ImageHistogramTest {
 
 	@Test
 	public void testImageHistogram() {
-		LOGGER.debug("testImageHistogram start");
+		LOGGER.info("testImageHistogram start");
 
 		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "yitulu_01.png");
 		if (src.empty()) {

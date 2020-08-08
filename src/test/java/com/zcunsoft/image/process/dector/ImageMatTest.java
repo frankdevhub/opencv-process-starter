@@ -38,8 +38,7 @@ public class ImageMatTest {
 		 */
 
 		// 类型与大小读取
-		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "border_test01.jpg",
-				Imgcodecs.IMREAD_GRAYSCALE);
+		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "nini.jpg", Imgcodecs.IMREAD_GRAYSCALE);
 		int type = src.type();
 		int width = src.cols();
 		int heigth = src.rows();

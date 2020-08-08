@@ -27,8 +27,8 @@ public class DevEnvironmentTest {
 	// 安装环境监测,测试是否能够正常运行
 	@Test
 	public void checkDevEnvironment() {
-		LOGGER.debug("load local system library");
-
+		LOGGER.info("load local system library");
+		LOGGER.debug("test log4j dependency");
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		Mat mat = Mat.eye(4, 4, CvType.CV_8UC1);
 		System.out.println("mat = \n" + mat.dump());
