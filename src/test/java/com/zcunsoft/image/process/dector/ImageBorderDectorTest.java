@@ -57,7 +57,8 @@ public class ImageBorderDectorTest {
 		 *
 		 */
 
-		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "nini.jpg");
+		// 书面卷曲平面的拍摄测试用例《父辈的旗帜硫磺岛》 test_20200806231643.png
+		Mat src = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "test_20200806231643.png");
 		Imgproc.resize(src, src, new Size(src.cols() / 2, src.rows() / 2));
 
 		LOGGER.info("display source image sample");

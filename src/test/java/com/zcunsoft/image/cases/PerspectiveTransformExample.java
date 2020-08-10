@@ -25,6 +25,6 @@ public class PerspectiveTransformExample {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
 
-	private final Logger LOGGER = LoggerFactory.getLogger(PerspectiveTransformExample.class);
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 }

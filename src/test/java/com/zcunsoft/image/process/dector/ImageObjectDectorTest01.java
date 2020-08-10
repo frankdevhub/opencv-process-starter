@@ -42,7 +42,7 @@ public class ImageObjectDectorTest01 {
 	static {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
-	private final Logger LOGGER = LoggerFactory.getLogger(ImageObjectDectorTest01.class);
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 	// 根据三个点计算中间那个点的夹角 pt1 pt0 pt2
 	private double getAngle(Point pt1, Point pt2, Point pt0) {
@@ -80,6 +80,7 @@ public class ImageObjectDectorTest01 {
 		return max_square_idx;
 	}
 
+	// Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	@Test
 	public void testObjectDectorExample() {
 		LOGGER.info("load image");
@@ -91,23 +92,30 @@ public class ImageObjectDectorTest01 {
 		// painting_example02.jpg //墙面悬挂油画测试用例
 		// painting_example03.jpg //墙面悬挂油画测试用例
 		// yitulu_01.png //艺图录后台管理系统中浏览的测试用例
-		Mat img = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "yitulu_01.png");
-		double fscale = 0.8; // 设定一个缩放的比例
+		// 52ddf260680df5f12428317f42ccb69.jpg 书本拍摄图片测试案例
+		Mat img = Imgcodecs.imread(TestCaseConstants.SAMPLE_PATH_PREFIX + "52ddf260680df5f12428317f42ccb69.jpg");
+		// namedWindow("gray_src",0);防止图片显示过大撑满屏幕导致画面失真
+		// 0=true可压缩 1=false不可压缩
+		HighGui.namedWindow("source image", 0);
+		HighGui.imshow("source image", img);
+
+		double fscale = 0.3; // 设定一个缩放的比例
 		Size outSize = new Size();
 		outSize.width = img.cols() * fscale;
 		outSize.height = img.rows() * fscale;
 		// 按照比例裁剪
-		Imgproc.resize(img, img, new Size(outSize.width, outSize.height), 0, 0, Imgproc.INTER_AREA);
+		Imgproc.resize(img, img, outSize, 0, 0, Imgproc.INTER_AREA);
 		LOGGER.info("source image width = " + img.size().width);
 		LOGGER.info("source image height = " + img.size().height);
 
-		HighGui.imshow("border dector source", img);
+		HighGui.imshow("resized image", img);
 		HighGui.waitKey();
 		Mat greyImg = img.clone();
 		// 彩色转灰色
-		Imgproc.cvtColor(img, greyImg, Imgproc.COLOR_BGR2GRAY);
-		HighGui.imshow("greyImg", greyImg);
-		HighGui.waitKey();
+		/*
+		 * Imgproc.cvtColor(img, greyImg, Imgproc.COLOR_BGR2GRAY);
+		 * HighGui.imshow("greyImg", greyImg); HighGui.waitKey();
+		 */
 		Mat gaussianBlurImg = greyImg.clone();
 		// 高斯滤波，降噪
 		Imgproc.GaussianBlur(greyImg, gaussianBlurImg, new Size(3, 3), 2, 2);
@@ -115,7 +123,7 @@ public class ImageObjectDectorTest01 {
 		HighGui.waitKey();
 		Mat cannyImg = gaussianBlurImg.clone();
 		// Canny边缘检测
-		Imgproc.Canny(gaussianBlurImg, cannyImg, 30, 190, 3, false);
+		Imgproc.Canny(gaussianBlurImg, cannyImg, 80, 240, 3, false);
 		HighGui.imshow("cannyImg", cannyImg);
 		HighGui.waitKey();
 		// 膨胀，连接边缘
@@ -127,6 +135,11 @@ public class ImageObjectDectorTest01 {
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		List<MatOfPoint> drawContours = new ArrayList<MatOfPoint>();
 		Mat hierarchy = new Mat();
+
+		// TODO:灰度明显的情况下灵敏度需要增加
+		// Imgproc.adaptiveThreshold(dilateImg, dilateImg, 255,
+		// Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY_INV,
+		// 3, 3);
 		Imgproc.findContours(dilateImg, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 		Mat linePic = Mat.zeros(dilateImg.rows(), dilateImg.cols(), CvType.CV_8UC3);
 		HighGui.imshow("linePic", linePic);
@@ -136,7 +149,7 @@ public class ImageObjectDectorTest01 {
 		List<MatOfPoint> hulls = new ArrayList<MatOfPoint>();
 		MatOfInt hull = new MatOfInt();
 		MatOfPoint2f approx = new MatOfPoint2f();
-		approx.convertTo(approx, CvType.CV_32F);
+		approx.convertTo(approx, CvType.CV_8UC3); // CV_32F?? CV_8UC3??
 
 		for (int i = 0; i < contours.size(); i++) {
 			MatOfPoint contour = contours.get(i); // 边框的凸包
@@ -165,7 +178,7 @@ public class ImageObjectDectorTest01 {
 			// 相似度匹配值散落区间内求出密度最高相邻相似度最高的值作为筛选的阀值
 
 			// TODO: P1
-			if (approx.rows() >= 4 && approx.rows() <= 5 && Math.abs(Imgproc.contourArea(approx)) > 107104 // case:20000
+			if (approx.rows() == 4 && Math.abs(Imgproc.contourArea(approx)) > 30000 // case:20000
 					&& Imgproc.isContourConvex(approxf1)) {
 				double maxCosine = 0;
 				for (int j = 2; j < 5; j++) {
@@ -184,7 +197,7 @@ public class ImageObjectDectorTest01 {
 				}
 			}
 		}
-		// 这里是把提取出来的轮廓通过不同颜色的线描述出来，具体效果可以自己去看
+
 		Random r = new Random();
 		for (int i = 0; i < drawContours.size(); i++) {
 			Imgproc.drawContours(linePic, drawContours, i, new Scalar(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
@@ -217,6 +230,7 @@ public class ImageObjectDectorTest01 {
 		}
 		// dstPoints储存的是变换后各点二维坐标
 		// imgPoints储存的是上面得到的四个角的坐标
+		// TODO 假设是多边形的情况下?
 		Point[] dstPoints = { new Point(0, 0), new Point(img.cols(), 0), new Point(img.cols(), img.rows()),
 				new Point(0, img.rows()) };
 		Point[] imgPoints = new Point[4];
@@ -225,11 +239,11 @@ public class ImageObjectDectorTest01 {
 		boolean sorted = false;
 		// 粗略估计为目标多边形的边界数量的粗略值
 		// 由相似度无限逼近获取的结果值定义n为多边形面积最大概率出现的边树
-		int n = lastHullPointList.size() - 1;
+		int n = 4;
 		// 对四个点进行排序 分出左上 右上 右下 左下
 		LOGGER.info("lastHullPointList size() = " + n);
 		while (!sorted) {
-			for (int i = 1; i <= n; i++) {
+			for (int i = 1; i < lastHullPointList.size(); i++) {
 				sorted = true;
 				LOGGER.info("i = " + i + "\t,n = " + n);
 				try {
@@ -241,7 +255,13 @@ public class ImageObjectDectorTest01 {
 						sorted = false;
 					}
 				} catch (Exception e) {
+					// TODO
+					// java.lang.ArrayIndexOutOfBoundsException: -1
+					// 05:11:39,557 [main] ERROR
+					// com.zcunsoft.image.process.dector.ImageObjectDectorTest01
+					// - error: i = 0 ,n = 4
 					e.printStackTrace();
+					LOGGER.error("error:\t" + "i = " + i + "\t,n = " + n);
 					break;
 				}
 			}
@@ -281,7 +301,7 @@ public class ImageObjectDectorTest01 {
 
 		HighGui.imshow("border dector processed", outPic);
 		HighGui.waitKey();
-		LOGGER.info("trnsform process complete");
+		LOGGER.info("transform process complete");
 	}
 
 	// 输出多边形对象多个特征点的二维坐标位置
